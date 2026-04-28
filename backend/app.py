@@ -1,9 +1,10 @@
 import os
 import uuid
 import json
+import hashlib
 from PIL import Image
 from flask_cors import CORS
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 
@@ -109,6 +110,54 @@ def analyse_image():
     return jsonify({
         "image_id": image_id,
         "analysis": analysis
+    })
+
+#file for saving tokens
+TOKENS_FILE ='./data/tokens.json'
+
+@app.route('/api/share_image', methods=['POST'])
+def share_share():
+    #get and validate redieved json
+    data = request.get.json()
+    if not data or 'image_id' not in data:
+        return jsonify({"error": "image_id required"}), 400
+    
+    image_id = data['image_id']
+    image_path = os.path.join(UPLOAD_DIR, image_id)
+
+    #check if image exists
+    if not os.path.exists(image_path):
+        return jsonify({"error": "image not found"}), 404
+    
+    #create unique token
+    random_part = uuid.uuid4().hex[:8]
+    timestamp = datetime.now().timestamp()
+    token_input = f"{image_id}{random_part}{timestamp}"
+    token = hashlib.sha256(token_input.encode()).hexdigest()[:16]
+
+    #calculate expiry date
+    expires_at = datetime.now() + timedelta(minutes=10)
+
+    #load existing tokens
+    if os.path.exists(TOKENS_FILE):
+        with open(TOKENS_FILE, 'r') as token_file:
+            tokens = json.load(token_file)
+    else:
+        tokens = {}
+
+    #save new token
+    tokens[token] = {
+        "image_id": image_id,
+        "expires_at": expires_at.isoformat()
+    }
+
+    with open(TOKENS_FILE, 'w') as token_file:
+        json.dump(tokens, token_file)
+    
+    return jsonify({
+        "token": token,
+        "url": f"/s/{token}",
+        "expires_at": expires_at.isoformat()
     })
 
 if __name__ == '__main__':
