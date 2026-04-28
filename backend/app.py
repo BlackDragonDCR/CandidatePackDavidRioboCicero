@@ -160,5 +160,53 @@ def share_share():
         "expires_at": expires_at.isoformat()
     })
 
+@app.route('/s/<token>', methods=['GET'])
+def shared_page(token):
+    #log tokens from file
+    TOKENS_FILE = './data/tokens.json'
+
+    if not os.path.exists(TOKENS_FILE):
+        return "link invalid or expired", 404
+    
+    with open(TOKENS_FILE, 'r') as token_file:
+        tokens = json.load(token_file)
+
+    #check if token exists
+    if token not in tokens:
+        return "link invalid or expired", 404
+    
+    #get token data
+    token_data = tokens[token]
+    image_id = token_data['image_id']
+    expires_at_str = token_data['expires_at']
+
+    #check if image exists
+    image_path = os.path.join(UPLOAD_DIR, image_id)
+    if not os.path.exists(image_path):
+        return "image not found", 404
+    
+    #check not expired
+    expires_at = datetime.fromisoformat(expires_at_str)
+    if datetime.now() > expires_at:
+        #clear expired tokens
+        del tokens[token]
+        with open(TOKEN_FILE, 'w') as token_file:
+            json.dump(tokens, token_file)
+        return "this share link has expired", 410
+    
+    #create url for image
+    image_url = f"/uploads/{image_id}"
+
+    #get image info for display
+    img = Image.open(image_path)
+    analysis = {
+        "width": img.width,
+        "height": img.height,
+        "format": img.format,
+        "size_kb": round(os.path.getsize(image_path) / 1024, 2)
+    }
+
+    #TO DO add html return
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
