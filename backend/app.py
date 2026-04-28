@@ -105,7 +105,7 @@ def analyse_image():
             "size_kb": round(os.path.getsize(image_path) / 1024, 2)
         }
     except Exception as e:
-        return jsonify({"error": f"failed to analyse image: {str(e)}"})
+        return jsonify({"error": f"failed to analyse image: {str(e)}"}), 500
     
     return jsonify({
         "image_id": image_id,
@@ -116,9 +116,9 @@ def analyse_image():
 TOKENS_FILE ='./data/tokens.json'
 
 @app.route('/api/share_image', methods=['POST'])
-def share_share():
+def share_image():
     #get and validate redieved json
-    data = request.get.json()
+    data = request.get_json()
     if not data or 'image_id' not in data:
         return jsonify({"error": "image_id required"}), 400
     
@@ -190,7 +190,7 @@ def shared_page(token):
     if datetime.now() > expires_at:
         #clear expired tokens
         del tokens[token]
-        with open(TOKEN_FILE, 'w') as token_file:
+        with open(TOKENS_FILE, 'w') as token_file:
             json.dump(tokens, token_file)
         return "this share link has expired", 410
     
