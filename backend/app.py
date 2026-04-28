@@ -92,7 +92,7 @@ def analyse_image():
 
     #check if image exists
     if not os.path.exists(image_path):
-        return jsonify({"error": "image not found"}), 400
+        return jsonify({"error": "image not found"}), 404
     
     #analyse image with PIL
     try:
