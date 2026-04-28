@@ -134,6 +134,7 @@ if (uploadForm) {
 }
 
 //analyse image
+// ========== ANALYSE IMAGE ==========
 const analyseBtn = document.getElementById('analyseBtn');
 if (analyseBtn) {
     analyseBtn.addEventListener('click', async () => {
@@ -147,7 +148,14 @@ if (analyseBtn) {
         
         console.log('Analysing:', imageId);
         
+        // Mostrar loading
+        const previewContainer = document.getElementById('analysisPreview');
+        const contentContainer = document.getElementById('analysisContent');
+        previewContainer.style.display = 'block';
+        contentContainer.innerHTML = '<p>Loading analysis...</p>';
+        
         try {
+            // Fetch image analysis
             const response = await fetch(`${API_BASE}/analyse_image`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -159,20 +167,50 @@ if (analyseBtn) {
             
             if (response.ok) {
                 const a = data.analysis;
-                const message = `${a.width} x ${a.height} px | ${a.format} | ${a.size_kb.toFixed(2)} KB`;
-                alert(message);
-                // Also show in the result div
+                const imageUrl = `${API_BASE.replace('/api', '')}/uploads/${imageId}`;
+                
+                // Build the HTML content
+                contentContainer.innerHTML = `
+                    <div style="text-align: center;">
+                        <img src="${imageUrl}" alt="${imageId}">
+                        <p><strong>Image ID:</strong> ${imageId}</p>
+                    </div>
+                    <div class="analysis-detail">
+                        <div class="analysis-card">
+                            <strong>${a.width} x ${a.height}</strong>
+                            <span>Dimensions (px)</span>
+                        </div>
+                        <div class="analysis-card">
+                            <strong>${a.format}</strong>
+                            <span>Format</span>
+                        </div>
+                        <div class="analysis-card">
+                            <strong>${a.size_kb.toFixed(2)} KB</strong>
+                            <span>File size</span>
+                        </div>
+                        <div class="analysis-card">
+                            <strong>${a.mode || 'N/A'}</strong>
+                            <span>Color mode</span>
+                        </div>
+                    </div>
+                `;
+                
+                // Also show simple message in the result div
                 const resultDiv = document.getElementById('analysisResult');
                 if (resultDiv) {
-                    resultDiv.innerHTML = message;
-                    resultDiv.className = 'info';
+                    resultDiv.innerHTML = `Analysis complete for ${imageId.slice(0, 20)}...`;
+                    resultDiv.className = 'success';
+                    setTimeout(() => {
+                        resultDiv.innerHTML = '';
+                        resultDiv.className = '';
+                    }, 3000);
                 }
             } else {
-                alert(`Error: ${data.error}`);
+                contentContainer.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Network error');
+            contentContainer.innerHTML = '<p style="color: red;">Network error. Is backend running?</p>';
         }
     });
 }

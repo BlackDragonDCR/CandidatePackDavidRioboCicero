@@ -131,6 +131,46 @@ select {
     margin-top: 0.5rem;
 }
 
+#analysisPreview {
+    background: #f8f9fa;
+    border-left: 4px solid #3498db;
+}
+
+#analysisPreview img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.analysis-detail {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.analysis-card {
+    background: white;
+    padding: 0.75rem;
+    border-radius: 8px;
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.analysis-card strong {
+    display: block;
+    font-size: 1.5rem;
+    color: #3498db;
+}
+
+.analysis-card span {
+    font-size: 0.8rem;
+    color: #666;
+}
+
 #uploadResult, #analysisResult {
     margin-top: 0.5rem;
     padding: 0.5rem;
