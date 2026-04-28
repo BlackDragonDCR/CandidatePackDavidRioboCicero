@@ -36,8 +36,8 @@ def upload_image():
     
     #save metadata
     if os.path.exists(META_FILE):
-        with open(META_FILE, 'r') as file:
-            meta = json.load(file)
+        with open(META_FILE, 'r') as meta_file:
+            meta = json.load(meta_file)
     else:
         meta = {}
         
@@ -46,8 +46,8 @@ def upload_image():
         "uploaded_at": datetime.now().isoformat()
     }
 
-    with open(META_FILE, 'w') as file:
-        json.dump(meta, file)
+    with open(META_FILE, 'w') as meta_file:
+        json.dump(meta, meta_file)
 
     return jsonify({
         "message": "Image uploaded successfully",
@@ -56,7 +56,27 @@ def upload_image():
 
 @app.route('/api/list_images', methods=['GET'])
 def list_images():
-    return jsonify({"items":[]})
+    #check directory existance
+    if not os.path.exists(META_FILE):
+        return jsonify({"items": []})
+    
+    with open(META_FILE, 'r') as meta_file:
+        meta = json.load(meta_file)
+    
+    items = []
+    for image_id, info in meta.items():
+        #check if files actually exist
+        if os.path.exists(os.path.join(UPLOAD_DIR, image_id)):
+            items.append({
+                "image_id": image_id,
+                "url": f"/uploads/{image_id}"
+            })
+
+    return jsonify({"items": items})
+
+@app.route('/uploads/<path:filename>')
+def serve_upload (filename):
+    return send_from_directory(UPLOAD_DIR, filename)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
