@@ -1,6 +1,6 @@
-//const API_BASE = '/api';
+const API_BASE = '/api';
 //only for testing with live server
-const API_BASE = 'http://localhost:8000/api';
+//const API_BASE = 'http://localhost:8000/api';
 
 console.log('JavaScript loaded');
 
