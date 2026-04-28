@@ -1,5 +1,5 @@
 //const API_BASE = '/api';
-//only for testing with live servr
+//only for testing with live server
 const API_BASE = 'http://localhost:8000/api';
 
 console.log('JavaScript loaded');
@@ -25,14 +25,83 @@ async function loadImages() {
             div.innerHTML = `
                 <img src="${item.url}" alt="${item.image_id}">
                 <p>${item.image_id.slice(0, 20)}...</p>
+                <button onclick="shareImage('${item.image_id}')">Share</button>
+                <button onclick="viewImage('${item.image_id}')">View</button>
             `;
             listContainer.appendChild(div);
         });
+
+        // Update analyse select
+        const analyseSelect = document.getElementById('analyseSelect');
+        if (analyseSelect) {
+            analyseSelect.innerHTML = '<option value="">Select an image...</option>';
+            data.items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.image_id;
+                option.textContent = item.image_id.slice(0, 35) + '...';
+                analyseSelect.appendChild(option);
+            });
+        }
         
     } catch (error) {
         console.error('Error:', error);
-        listContainer.innerHTML = '<p>Error loading images. Is backend running?</p>';
+         const listContainer = document.getElementById('imageList');
+        if (listContainer) {
+            listContainer.innerHTML = '<p>Error loading images. Is backend running?</p>';
+        }
     }
+}
+
+//view images
+window.viewImage = (imageId) => {
+    console.log('Viewing image:', imageId);
+    const imageUrl = `${API_BASE.replace('/api', '')}/uploads/${imageId}`;
+    window.open(imageUrl, '_blank');
+};
+
+//upload images
+const uploadForm = document.getElementById('uploadForm');
+if (uploadForm) {
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        console.log('Upload form submitted');
+        
+        const fileInput = document.getElementById('imageFile');
+        const file = fileInput.files[0];
+        
+        if (!file) {
+            alert('Please select a file');
+            return;
+        }
+        
+        console.log('File:', file.name);
+        
+        const formData = new FormData();
+        formData.append('image', file);
+        
+        try {
+            const response = await fetch(`${API_BASE}/upload_image`, {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            console.log('Upload response:', data);
+            
+            if (response.ok) {
+                alert(`Uploaded! ID: ${data.image_id}`);
+                fileInput.value = '';
+                loadImages();
+            } else {
+                alert(`Error: ${data.error}`);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Network error');
+        }
+    });
+} else {
+    console.error('uploadForm not found in HTML');
 }
 
 // Load images when page loads
