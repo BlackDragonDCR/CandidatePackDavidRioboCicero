@@ -1,6 +1,15 @@
-FROM nginx:alpine
-COPY frontend/index.html /usr/share/nginx/html/index.html
-COPY frontend/nginx/default.conf /etc/nginx/conf.d/default.conf
+FROM python:3.11-slim
 
-COPY frontend/script.js /usr/share/nginx/html/script.js
-COPY frontend/styles.css /usr/share/nginx/html/styles.css
+WORKDIR /app
+
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY backend/ .
+
+ENV PORT=8000
+ENV UPLOAD_DIR=/app/data/uploads
+
+EXPOSE 8000
+
+CMD ["python", "app.py"]
