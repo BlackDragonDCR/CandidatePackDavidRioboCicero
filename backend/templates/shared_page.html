@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogMeal - Shared Image</title>
+    <!-- Open Graph tags -->
+    <meta property="og:title" content="Shared Image from LogMeal">
+    <meta property="og:type" content="image">
+    <meta property="og:image" content="{{ image_url }}">
+    <meta property="og:description" content="Image shared via LogMeal - {{ width }}x{{ height }}px, {{ format }}, {{ size_kb }} KB">
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            background: #f0f2f5;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: left;
+        }
+        .warning {
+            color: #e67e22;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+        .expires {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Shared Image</h1>
+        <img src="{{ image_url }}" alt="Shared content from LogMeal">
+        <div class="info">
+            <p><strong>Image ID:</strong> {{ image_id }}</p>
+            <p><strong>Dimensions:</strong> {{ width }} x {{ height }} px</p>
+            <p><strong>Format:</strong> {{ format }}</p>
+            <p><strong>File size:</strong> {{ size_kb }} KB</p>
+        </div>
+        <p class="warning">This link expires at: {{ expires_at_str }}</p>
+        <p class="expires">After expiration, this link will no longer work</p>
+    </div>
+</body>
+</html>

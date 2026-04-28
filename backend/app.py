@@ -5,7 +5,7 @@ import hashlib
 from PIL import Image
 from flask_cors import CORS
 from datetime import datetime, timedelta
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, render_template
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -199,14 +199,22 @@ def shared_page(token):
 
     #get image info for display
     img = Image.open(image_path)
-    analysis = {
-        "width": img.width,
-        "height": img.height,
-        "format": img.format,
-        "size_kb": round(os.path.getsize(image_path) / 1024, 2)
-    }
+    width = img.width
+    height = img.height
+    format_img = img.format
+    size_kb = round(os.path.getsize(image_path) / 1024, 2)
 
-    #TO DO add html return
+    # render HTML template
+    return render_template(
+        'shared_page.html',
+        image_url=image_url,
+        image_id=image_id,
+        width=width,
+        height=height,
+        format=format_img,
+        size_kb=size_kb,
+        expires_at_str=expires_at.strftime('%Y-%m-%d %H:%M:%S')
+    )
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
