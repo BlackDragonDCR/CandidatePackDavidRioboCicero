@@ -1,6 +1,7 @@
 import os
 import uuid
 import json
+from PIL import Image
 from flask_cors import CORS
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
@@ -77,6 +78,38 @@ def list_images():
 @app.route('/uploads/<path:filename>')
 def serve_upload (filename):
     return send_from_directory(UPLOAD_DIR, filename)
+
+@app.route('/api/analyse_image', methods=['POST'])
+def analyse_image():
+    #get and validate json
+    data = request.get_json()
+    if not data or 'image_id' not in data:
+        return jsonify({"error": "image_id required"}), 400
+    
+    image_id = data['image_id']
+    image_path = os.path.join(UPLOAD_DIR, image_id)
+
+    #check if image exists
+    if not os.path.exists(image_path):
+        return jsonify({"error": "image not found"}), 400
+    
+    #analyse image with PIL
+    try:
+        img = Image.open(image_path)
+        analysis = {
+            "width": img.width,
+            "height": img.height,
+            "format": img.format,
+            "mode": img.mode,
+            "size_kb": round(os.path.getsize(image_path) / 1024, 2)
+        }
+    except Exception as e:
+        return jsonify({"error": f"failed to analyse image: {str(e)}"})
+    
+    return jsonify({
+        "image_id": image_id,
+        "analysis": analysis
+    })
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
