@@ -59,6 +59,35 @@ window.viewImage = (imageId) => {
     window.open(imageUrl, '_blank');
 };
 
+//share images
+window.shareImage = async (imageId) => {
+    console.log('Sharing image:', imageId);
+    
+    try {
+        const response = await fetch(`${API_BASE}/share_image`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image_id: imageId })
+        });
+        
+        const data = await response.json();
+        console.log('Share response:', data);
+        
+        if (response.ok) {
+            const fullUrl = `http://localhost:8000${data.url}`;
+            alert(`Share link (valid for 10 minutes):\n${fullUrl}`);
+            await navigator.clipboard.writeText(fullUrl);
+            alert('Link copied to clipboard!');
+        } else {
+            alert(`Error: ${data.error}`);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Network error');
+    }
+};
+
+
 //upload images
 const uploadForm = document.getElementById('uploadForm');
 if (uploadForm) {
