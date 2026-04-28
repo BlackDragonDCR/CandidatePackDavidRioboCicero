@@ -133,5 +133,49 @@ if (uploadForm) {
     console.error('uploadForm not found in HTML');
 }
 
+//analyse image
+const analyseBtn = document.getElementById('analyseBtn');
+if (analyseBtn) {
+    analyseBtn.addEventListener('click', async () => {
+        const select = document.getElementById('analyseSelect');
+        const imageId = select.value;
+        
+        if (!imageId) {
+            alert('Please select an image');
+            return;
+        }
+        
+        console.log('Analysing:', imageId);
+        
+        try {
+            const response = await fetch(`${API_BASE}/analyse_image`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image_id: imageId })
+            });
+            
+            const data = await response.json();
+            console.log('Analyse response:', data);
+            
+            if (response.ok) {
+                const a = data.analysis;
+                const message = `${a.width} x ${a.height} px | ${a.format} | ${a.size_kb.toFixed(2)} KB`;
+                alert(message);
+                // Also show in the result div
+                const resultDiv = document.getElementById('analysisResult');
+                if (resultDiv) {
+                    resultDiv.innerHTML = message;
+                    resultDiv.className = 'info';
+                }
+            } else {
+                alert(`Error: ${data.error}`);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Network error');
+        }
+    });
+}
+
 // Load images when page loads
 loadImages();
