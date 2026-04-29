@@ -3,7 +3,7 @@
 ## Requisitos previos
 
 - Python 3.11 o superior
-- Docker (opcional, si se quiere ejecutar con contenedores)
+- Docker (opcional)
 
 ## Ejecución del proyecto
 
@@ -23,22 +23,22 @@ py -m http.server 3000
 (La interfaz estará disponible en http://localhost:3000)
 
 ### Opción 2: Ejecución con Docker
-instalar docker a través del sitio oficial para la version de sistema correcta
-correr Docker
-ejecutar en una terminal: "docker compose up --build"
-acceder a "http://localhost:3000" usando un browser
+instalar docker a través del sitio oficial para la version de sistema correcta  
+correr Docker  
+ejecutar en una terminal: "docker compose up --build"  
+acceder a "http://localhost:3000" usando un browser  
 (para detener los contenedores se puede usar "docker compose down" en la terminal en la que se inició o usando ctrl+C)
 
 ## Propriedades del proyecto
 
 ### Endpoints disponibles
 
-POST /api/upload_image - Subir una imagen
-GET	/api/list_images - Listar todas las imágenes subidas
-POST /api/analyse_image - Analizar imagen
-POST /api/share_image - Generar enlace temporal (10 minutos)
-GET	/s/{token} - Página pública con la imagen compartida
-GET	/uploads/{filename} - Servir el archivo de imagen
+POST /api/upload_image - Subir una imagen  
+GET	/api/list_images - Listar todas las imágenes subidas  
+POST /api/analyse_image - Analizar imagen  
+POST /api/share_image - Generar enlace temporal (10 minutos)  
+GET	/s/{token} - Página pública con la imagen compartida  
+GET	/uploads/{filename} - Servir el archivo de imagen  
 
 ### Frontend
 la interfaz permite:
