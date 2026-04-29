@@ -1,39 +1,68 @@
-# LogMeal — Full-stack Technical Take-Home (Spec-Only Pack)
+# LogMeal Take-Home Project — David Riobo Cicero
 
-**Submission window:** 48 h · **Estimated effort:** 6–8 h
+## Requisitos previos
 
-Implement a small **API + Front-end** to upload images, list them, and analyse one image by id — plus the **Share Link (10min TTL)** feature.
+- Python 3.11 o superior
+- Docker (opcional, si se quiere ejecutar con contenedores)
 
-## What you must build
+## Ejecución del proyecto
 
-- Backend (using Python Flask) with at least these endpoints (see `docs/openapi.yaml` documentation):
-  - `POST /api/upload_image`
-  - `GET  /api/list_images`
-  - `POST /api/analyse_image` (must return some information about the image)
-  - `POST /api/share_image` (returns `{ token, url, expires_at }`)
-  - `GET  /s/{token}` (public HTML page with OG tags)
+### Opción 1: Ejecución local (sin Docker)
 
-- Front-end (using at least HTML + CSS + JS) that lets a user:
-  - Upload an image, list images, analyse an image.
-  - Generate and open a **share link**.
+1. **Backend**
+ejecutar en una terminal:
+cd backend
+pip install -r requirements.txt
+py app.py
+(El servidor estará disponible en http://localhost:8000)
 
-- Containers: `docker-compose up --build` must bring up frontend (3000) and backend (8000) without extra steps (see Docker Compose https://docs.docker.com/compose/).
+2. **Frontend**
+ejecutar en otra terminal:
+cd frontend
+py -m http.server 3000
+(La interfaz estará disponible en http://localhost:3000)
 
-- README.md file explaining what you developed and including the instructions of how to run the code.
+### Opción 2: Ejecución con Docker
+instalar docker a través del sitio oficial para la version de sistema correcta
+correr Docker
+ejecutar en una terminal: "docker compose up --build"
+acceder a "http://localhost:3000" usando un browser
+(para detener los contenedores se puede usar "docker compose down" en la terminal en la que se inició o usando ctrl+C)
 
-- Submit the code in a Gitlab or Github repository.
+## Propriedades del proyecto
 
-## Optional extra tasks
+### Endpoints disponibles
 
-- Basic test suite (pytest or similar) and coverage ≥60%. Include inside 'tests' folder.
-- Serve Swagger UI from the backend (using `docs/openapi.yaml`).
-- CI (GitHub Actions) that builds containers and runs tests.
-- S3-compatible storage (e.g., MinIO in docker-compose).
-- i18n EN/ES in the frontend using JSON string tables.
-- Strict typing (mypy/tsc) with no errors.
+POST /api/upload_image - Subir una imagen
+GET	/api/list_images - Listar todas las imágenes subidas
+POST /api/analyse_image - Analizar imagen
+POST /api/share_image - Generar enlace temporal (10 minutos)
+GET	/s/{token} - Página pública con la imagen compartida
+GET	/uploads/{filename} - Servir el archivo de imagen
 
-## Fair play
+### Frontend
+la interfaz permite:
+- subir imagenes
+- ver listado con miniatura, id de imagen y mas opciones
+- ver miniaturas listadas en tamaño completo
+- compartir imagenes junto de su analisis con un enlace generado que expira despues de 10 minutos
+- analizar imagenes en la pagina
 
-- Do not exceed 6–8 h of effort.
-- You may change technologies if you explain it in the README.
-- Keep commits small and meaningful.
+el analisis incluye: 
+- ancho y alto de la imagen
+- formato de imagen
+- tamaño en kilobytes
+- modo de color
+
+### Sobre Docker
+El archivo docker-compose.yml levanta dos servicios:
+- backend: Python + Flask en el puerto 8000
+- frontend: Nginx sirviendo archivos estáticos en el puerto 3000
+
+Los datos subidos se almacenan en backend/data/uploads y persisten entre ejecuciones gracias al volumen montado.
+
+### Decisiones Tecnicas
+- Backend: Flask con almacenamiento en disco (archivos JSON para metadatos y tokens)
+- Frontend: HTML/CSS/JS vanilla (sin frameworks)
+- Tokens: Se generan con uuid + hashlib.sha256, expiran a los 10 minutos
+- Análisis de imágenes: Librería Pillow (PIL)
